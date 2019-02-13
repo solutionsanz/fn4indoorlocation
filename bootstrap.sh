@@ -4,9 +4,6 @@
 #######################################################################
 #################### Reading and validating passed parameters and mandatory files:
 
- # Default user is vagrant. I'll control sudo access manually.
-sudo su vagrant
-
 # Checking if Private key exists:
 cp -r /vagrant/ssh /home/vagrant/ssh
 chmod 400 /home/vagrant/ssh/*
@@ -81,12 +78,15 @@ REGION_SHORTNAME=$5
     echo "##########################################################################"
     echo "############### Installing Kubectl for target OKE cluster ########################"
 
-    # Installing OCI CLI:
+    # Configuring kubectl under vagrant user:
+    sudo su vagrant
+
+    echo " ################## Installing OCI CLI:"
     bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh) --accept-all-defaults"
     bash # Used to get oci cli available on this bash straightaway.
 
 
-    # Configuring .oci/config:
+    echo " ################## Configuring .oci/config:"
     #    Interactive way: bash oci setup config
 
     mkdir -p /home/vagrant/.oci && cp /vagrant/oci/config_template /home/vagrant/.oci/config
@@ -96,11 +96,11 @@ REGION_SHORTNAME=$5
     sed -i "s/@TENANCY_OCID@/${TENANCY_OCID}/g" /home/vagrant/.oci/config
     sed -i "s/@REGION_SHORTNAME@/${REGION_SHORTNAME}/g" /home/vagrant/.oci/config
 
-    # Downloading kube config file for a particular oke cluster tenancy:
+    echo " ################## Downloading kube config file for a particular oke cluster tenancy:"
     mkdir -p /home/vagrant/.kube
     oci ce cluster create-kubeconfig --cluster-id $OKE_OCID --file /home/vagrant/.kube/config --region $REGION_SHORTNAME
 
-    # Installing kubectl one we've got the kube config file:
+    echo " ################## Installing kubectl now that we've got the kube config file:"
     sudo apt-get update && sudo apt-get install -y apt-transport-https
 
     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -111,5 +111,5 @@ REGION_SHORTNAME=$5
 
     sudo apt-get install kubectl
 
-    # Testing kubectl:
+    echo " ################## Testing kubectl:"
     kubectl get nodes
