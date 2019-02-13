@@ -4,6 +4,9 @@
 #######################################################################
 #################### Reading and validating passed parameters and mandatory files:
 
+ # Default user is vagrant. I'll control sudo access manually.
+sudo su vagrant
+
 # Checking if Private key exists:
 cp -r /vagrant/ssh /home/vagrant/ssh
 chmod 400 /home/vagrant/ssh/*
@@ -65,8 +68,8 @@ REGION_SHORTNAME=$5
 
     sudo apt-get install docker-ce -y --force-yes
 
-    #echo "############################################################################################################"
-    #echo "########### Installing and Configuring Node-Oracledb with Oracle DB Instant Client ##############################"
+    echo "############################################################################################################"
+    echo "########### Installing and Configuring Node-Oracledb with Oracle DB Instant Client ##############################"
     #  See: https://oracle.github.io/node-oracledb/ 
 
     sudo apt-get install libaio1 -y
@@ -78,9 +81,8 @@ REGION_SHORTNAME=$5
     echo "##########################################################################"
     echo "############### Installing Kubectl for target OKE cluster ########################"
 
-
     # Installing OCI CLI:
-    bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh --accept-all-defaults)"
+    bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh) --accept-all-defaults"
     bash # Used to get oci cli available on this bash straightaway.
 
 
@@ -93,7 +95,6 @@ REGION_SHORTNAME=$5
     sed -i "s/@PUB_KEY_FINGERPRINT@/${PUB_KEY_FINGERPRINT}/g" /home/vagrant/.oci/config
     sed -i "s/@TENANCY_OCID@/${TENANCY_OCID}/g" /home/vagrant/.oci/config
     sed -i "s/@REGION_SHORTNAME@/${REGION_SHORTNAME}/g" /home/vagrant/.oci/config
-
 
     # Downloading kube config file for a particular oke cluster tenancy:
     mkdir -p /home/vagrant/.kube
